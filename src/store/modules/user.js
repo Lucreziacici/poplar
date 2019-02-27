@@ -1,5 +1,5 @@
 import { GetFunction, logout, Login } from '@/api/login'
-import { GetSupplierInfo } from "@/api/supplier";
+import { GetSupplierInfo } from '@/api/supplier'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { Message } from 'element-ui'
 const user = {
@@ -49,7 +49,7 @@ const user = {
     LoginByUsername({ commit }, userInfo) {
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
-        Login({ user_name: username, login_id: username, login_pwd: userInfo.password }).then(response => {
+        Login({ user_name: username, login_id: username, login_pwd: userInfo.password, supplier_flag: '1' }).then(response => {
           if (response.data.res_status_code == 0) {
             commit('SET_TOKEN', response.data.res_content.token)
             setToken(response.data.res_content.token)
@@ -59,7 +59,7 @@ const user = {
           } else {
             Message({
               message: response.data.res_message,
-              type: 'error',
+              type: 'error'
             })
             resolve(response)
           }
@@ -85,7 +85,7 @@ const user = {
           }
           commit('SET_NAME', data.user_name)
 
-          GetSupplierInfo({ supplier_id: "" }).then(response => {
+          GetSupplierInfo({ supplier_id: '' }).then(response => {
             if (response.data.res_status_code == 0) {
               if (response.data.res_content.logo) {
                 commit('SET_AVATAR', response.data.res_content.logo)
@@ -93,11 +93,9 @@ const user = {
                 commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
               }
             }
-
           }).catch(error => {
             reject(error)
           })
-
 
           // commit('SET_INTRODUCTION', data.introduction)
           resolve(response)

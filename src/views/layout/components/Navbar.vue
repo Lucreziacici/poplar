@@ -1,28 +1,51 @@
 <template>
   <div class="navbar">
-    <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
+    <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container" />
 
-    <breadcrumb class="breadcrumb-container"/>
+    <breadcrumb class="breadcrumb-container" />
 
     <div class="right-menu">
+
       <template v-if="device!=='mobile'">
 
+        <el-dropdown class="international right-menu-item" placement="bottom-start" trigger="click">
+          <span @click="GetCollect()">
+            {{ $t('navbar.collect') }}
+            <i class="el-icon-arrow-down el-icon--right"/>
+          </span>
+          <el-dropdown-menu v-if="collectList.length>0" slot="dropdown">
+            <el-dropdown-item v-for="(item,index) in collectList" :key="index">
+              <span class="flex_between_center padding-content">
+                <router-link :to="item.path"> {{ generateTitle(item.name) }}
+                  <i class="el-icon-arrow-right"/>
+                </router-link>
+                <i class="el-icon-delete pl-5" @click="deleteCollect(item)"/>
+              </span>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+          <el-dropdown-menu v-else slot="dropdown">
+            <el-dropdown-item>
+              <span class="flex_between_center padding-content">
+                {{ $t('navbar.nodata') }}
+              </span>
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
         <el-tooltip :content="$t('navbar.screenfull')" effect="dark" placement="bottom">
-          <screenfull class="screenfull right-menu-item"/>
+          <screenfull class="screenfull right-menu-item" />
         </el-tooltip>
 
         <el-tooltip :content="$t('navbar.size')" effect="dark" placement="bottom">
-          <size-select class="international right-menu-item"/>
+          <size-select class="international right-menu-item" />
         </el-tooltip>
-        <lang-select class="international right-menu-item"/>
+        <lang-select class="international right-menu-item" />
 
-      
       </template>
 
       <el-dropdown class="avatar-container right-menu-item" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
-          <i class="el-icon-caret-bottom"/>
+          <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
           <router-link to="/">
@@ -30,6 +53,7 @@
               {{ $t('route.dashboard') }}
             </el-dropdown-item>
           </router-link>
+
           <el-dropdown-item divided>
             <span style="display:block;" @click="logout">{{ $t('navbar.logOut') }}</span>
           </el-dropdown-item>
@@ -41,6 +65,8 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { GetMyFavorites, DeleteFromMyFavorite } from '@/api/common'
+import { generateTitle } from '@/utils/i18n'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
 import Screenfull from '@/components/Screenfull'
@@ -55,13 +81,13 @@ export default {
     SizeSelect,
     LangSelect
   },
+  data() {
+    return {
+      collectList: []
+    }
+  },
   computed: {
-    ...mapGetters([
-      'sidebar',
-      'name',
-      'avatar',
-      'device'
-    ])
+    ...mapGetters(['sidebar', 'name', 'avatar', 'device'])
   },
   methods: {
     toggleSideBar() {
@@ -69,9 +95,39 @@ export default {
     },
     logout() {
       this.$store.dispatch('LogOut').then(() => {
-        location.reload()// In order to re-instantiate the vue-router object to avoid bugs
+        location.reload() // In order to re-instantiate the vue-router object to avoid bugs
       })
-    }
+    },
+    GetCollect() {
+      item.system_id = '1'
+      GetMyFavorites({ 'system_id': '1' }).then(response => {
+        if (response.data.res_status_code == 0) {
+          this.collectList = response.data.res_content
+        } else {
+          this.$message({
+            type: 'error',
+            message: response.data.res_message
+          })
+        }
+      })
+    },
+    deleteCollect(item) {
+      DeleteFromMyFavorite(item).then(response => {
+        if (response.data.res_status_code == 0) {
+          this.$message({
+            type: 'success',
+            message: this.$t('message.operatesuc')
+          })
+          this.GetCollect()
+        } else {
+          this.$message({
+            type: 'error',
+            message: response.data.res_message
+          })
+        }
+      })
+    },
+    generateTitle
   }
 }
 </script>
@@ -87,7 +143,7 @@ export default {
     float: left;
     padding: 0 10px;
   }
-  .breadcrumb-container{
+  .breadcrumb-container {
     float: left;
   }
   .errLog-container {
@@ -97,8 +153,8 @@ export default {
   .right-menu {
     float: right;
     height: 100%;
-    &:focus{
-     outline: none;
+    &:focus {
+      outline: none;
     }
     .right-menu-item {
       display: inline-block;
@@ -107,7 +163,7 @@ export default {
     .screenfull {
       height: 20px;
     }
-    .international{
+    .international {
       vertical-align: top;
     }
     .theme-switch {

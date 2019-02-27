@@ -1,30 +1,29 @@
 import request from '@/utils/request'
 
-
 // 登录
 export function Login(data) {
   return request({
     url: 'SupplierLogin/Login',
     method: 'post',
-    data:data
+    data: data
   })
 }
 
 // 获取路由信息
-export function GetFunction(data){
+export function GetFunction(data) {
   return request({
     url: 'SupplierLogin/GetFunction',
     method: 'get',
-    params:{token:data}
+    params: { token: data, supplier_flag: '1' }
   })
 }
 
 // 更改密码GET /api/SupplierLogin/ChangePassword
-export function ChangePassword(data){
+export function ChangePassword(data) {
   return request({
     url: 'SupplierLogin/ChangePassword',
     method: 'get',
-    params:data
+    params: data
   })
 }
 export function loginByUsername(username, password) {
@@ -38,7 +37,6 @@ export function loginByUsername(username, password) {
     data
   })
 }
-
 
 export function logout() {
   return request({
